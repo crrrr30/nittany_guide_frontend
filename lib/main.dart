@@ -24,25 +24,20 @@ class App extends StatelessWidget {
         GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme);
     AppComponents.dmSerifDisplayTextTheme =
         GoogleFonts.dmSerifDisplayTextTheme(Theme.of(context).textTheme);
+    ThemeData theme = ThemeData.light();
+    theme = theme.copyWith(
+        dividerColor: Colors.transparent,
+        textTheme: GoogleFonts.dmSansTextTheme());
 
     return ScreenUtilInit(
       builder: (BuildContext context, Widget? child) => GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Nittany Guide',
-        theme: ThemeData.light(),
+        theme: theme,
         initialRoute: AppRoutes.APPLICATION,
         getPages: AppPages.routes,
         scaffoldMessengerKey: Get.find<GlobalKey<ScaffoldMessengerState>>(),
       ),
     );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }

@@ -3,37 +3,29 @@ import 'dart:core';
 
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:dio/dio.dart';
+import 'package:nittany_guide_frontend/common/constants.dart';
 
 class HttpService {
   static final dio = Dio(BaseOptions(validateStatus: (status) => true));
 
-  // static Future<({bool success})> updateProfile(UserProfile profile) async {
-  //   dio.options.headers['Authorization'] = await UserProfile.token;
-  //   try {
-  //     final response = await dio.post(
-  //       API_BASE_URL + UPDATE_PROFILE_API_ENDPOINT,
-  //       data: profile.toJSON(),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       Globals.connected = true;
-  //       debugPrint("Response: ${response.data}");
-  //       return (success: true);
-  //     } else if (response.statusCode == 400) {
-  //       debugPrint("Serialization error");
-  //       return (success: false);
-  //     } else if (response.statusCode == 500 || response.statusCode == 502) {
-  //       Globals.connected = false;
-  //       debugPrint("Server down");
-  //       return (success: false);
-  //     }
-  //     Globals.connected = false;
-  //     debugPrint("updatePreferences failed with code ${response.statusCode}");
-  //     return (success: false);
-  //   } on DioException catch (e) {
-  //     Globals.connected = false;
-  //     debugPrint("DioException with error $e");
-  //     return (success: false);
-  //   }
-  // }
+  static Future<String?> uploadFile(
+      List<int> bytes, void Function(int, int) onSendProgress) async {
+    try {
+      final formData =
+          FormData.fromMap({"what-if": MultipartFile.fromBytes(bytes)});
+      final response = await dio.post(API_BASE_URL + UPLOAD_API_ENDPOINT,
+          data: formData,
+          onSendProgress: (count, total) => print("$count / $total}"));
+      if (response.statusCode == 200 &&
+          (response.data as Map<String, dynamic>).keys.contains('status') &&
+          response.data['status'] == true &&
+          (response.data as Map<String, dynamic>).keys.contains('data')) {
+        return response.data['data']['uri'];
+      } else {
+        return null;
+      }
+    } on DioException {
+      return null;
+    }
+  }
 }
