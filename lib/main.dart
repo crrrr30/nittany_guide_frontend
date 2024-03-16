@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:nittany_guide_frontend/common/components.dart';
 import 'package:nittany_guide_frontend/common/http_service.dart';
 import 'package:nittany_guide_frontend/common/routes/index.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   Get.put<HttpService>(HttpService());
   Get.put<GlobalKey<ScaffoldMessengerState>>(
       GlobalKey<ScaffoldMessengerState>());
@@ -15,13 +20,20 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TasteMate',
-      theme: ThemeData.light(),
-      initialRoute: AppRoutes.APPLICATION,
-      getPages: AppPages.routes,
-      scaffoldMessengerKey: Get.find<GlobalKey<ScaffoldMessengerState>>(),
+    AppComponents.dmSansTextTheme =
+        GoogleFonts.dmSansTextTheme(Theme.of(context).textTheme);
+    AppComponents.dmSerifDisplayTextTheme =
+        GoogleFonts.dmSerifDisplayTextTheme(Theme.of(context).textTheme);
+
+    return ScreenUtilInit(
+      builder: (BuildContext context, Widget? child) => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Nittany Guide',
+        theme: ThemeData.light(),
+        initialRoute: AppRoutes.APPLICATION,
+        getPages: AppPages.routes,
+        scaffoldMessengerKey: Get.find<GlobalKey<ScaffoldMessengerState>>(),
+      ),
     );
   }
 }

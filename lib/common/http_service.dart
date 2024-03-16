@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:core';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:dio/dio.dart';
 
