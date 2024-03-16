@@ -62,4 +62,22 @@ class AppComponents {
             content: Text(text),
             duration: duration ?? ALERT_DURATION,
           ));
+
+  static const gradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment(0.8, 1),
+    colors: <Color>[
+      Color(0xFFFCB045),
+      Color(0xFFFE2D2D),
+      Color(0xFF9430D8),
+    ],
+    tileMode: TileMode.mirror,
+  );
+
+  static overlayGradient(Widget widget, {Gradient gradient = gradient}) =>
+      ShaderMask(
+        blendMode: BlendMode.srcIn,
+        shaderCallback: gradient.createShader,
+        child: widget,
+      );
 }

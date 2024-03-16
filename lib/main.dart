@@ -26,6 +26,7 @@ class App extends StatelessWidget {
         GoogleFonts.dmSerifDisplayTextTheme(Theme.of(context).textTheme);
     ThemeData theme = ThemeData.light();
     theme = theme.copyWith(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         dividerColor: Colors.transparent,
         textTheme: GoogleFonts.dmSansTextTheme());
 

@@ -14,4 +14,4 @@ final PADDING_LARGE_WIDTH = SizedBox(width: 24.r);
 const ALERT_DURATION = Duration(seconds: 1);
 
 const API_BASE_URL = "https://backend.nittany-guide.tech/";
-const UPLOAD_API_ENDPOINT = 'upload/';
+const UPLOAD_API_ENDPOINT = 'upload';
