@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:nittany_guide_frontend/common/constants.dart';
+import "package:lottie/lottie.dart";
 
 class AppComponents {
   static late TextTheme dmSansTextTheme, dmSerifDisplayTextTheme;
@@ -80,4 +81,29 @@ class AppComponents {
         shaderCallback: gradient.createShader,
         child: widget,
       );
+
+  static showLoadingDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
+        content: SizedBox(
+          height: 0.5.sh,
+          child: Center(
+            child: Wrap(
+              direction: Axis.vertical,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Lottie.asset('assets/isotropic.json'),
+                PADDING_MEDIUM_HEIGHT,
+                AppComponents.sansHeadline("Loading..."),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -1,6 +1,7 @@
+import "dart:ui";
+
 import "package:file_picker/file_picker.dart";
 import "package:flutter/material.dart";
-import "package:flutter/widgets.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
 import "package:get/get.dart";
 import "package:nittany_guide_frontend/common/components.dart";
@@ -12,7 +13,7 @@ class ApplicationPage extends GetView<ApplicationController> {
   const ApplicationPage({super.key});
 
   Widget _uploadPDFButton() => SizedBox(
-        height: 72.r,
+        height: 50.r,
         child: Center(
           child: InkWell(
             onTap: () async {
@@ -22,18 +23,17 @@ class ApplicationPage extends GetView<ApplicationController> {
               } else if (!result.files.single.name
                   .toLowerCase()
                   .endsWith('.pdf')) {
-                AppComponents.showSnackBar("Fuck you");
+                AppComponents.showSnackBar("Only PDF files are supported!");
               } else {
-                AppComponents.showSnackBar(result.files.single.name);
-                HttpService.uploadFile(result.files.single.bytes as List<int>,
+                controller.filename.value = result.files.single.name;
+                controller.id = await HttpService.uploadFile(
+                    result.files.single.bytes as List<int>,
                     (a, b) => print("$a, $b"));
-                // File file = File(result.files.single.path!);
-                // User canceled the picker
               }
             },
             borderRadius: BorderRadius.circular(1.sw),
             child: Container(
-              width: 256.r,
+              width: 0.3.sw,
               height: 48.r,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(1.sw),
@@ -41,10 +41,40 @@ class ApplicationPage extends GetView<ApplicationController> {
               ),
               child: Center(
                 child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     const Icon(Icons.upload_file),
                     PADDING_MEDIUM_WIDTH,
-                    AppComponents.sansTitle("Upload PDF"),
+                    AppComponents.sansTitle("PDF"),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Widget _submitButton(BuildContext context) => SizedBox(
+        height: 72.r,
+        child: Center(
+          child: InkWell(
+            onTap: () => controller.onSubmitted(
+                context, Get.find<TextEditingController>().text),
+            borderRadius: BorderRadius.circular(1.sw),
+            child: Container(
+              width: 0.35.sw,
+              height: 48.r,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(1.sw),
+                border: Border.all(),
+              ),
+              child: Center(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    const Icon(Icons.arrow_forward),
+                    PADDING_MEDIUM_WIDTH,
+                    AppComponents.sansTitle("Submit"),
                   ],
                 ),
               ),
@@ -55,16 +85,19 @@ class ApplicationPage extends GetView<ApplicationController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put<TextEditingController>(TextEditingController());
     return Scaffold(
       appBar: AppBar(
         title: Wrap(
           children: [
             Container(
-              height: 32,
-              width: 32,
+              height: 32.r,
+              width: 32.r,
               decoration: const BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage("assets/logo.png"), fit: BoxFit.cover)),
+                      image: AssetImage("assets/logo.png"),
+                      fit: BoxFit.cover,
+                      isAntiAlias: true)),
             ),
             const SizedBox(width: 24),
             AppComponents.serifHeadline("Nittany Guide"),
@@ -74,113 +107,130 @@ class ApplicationPage extends GetView<ApplicationController> {
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.black.withOpacity(0.3),
       ),
-      body: Center(
-        child: SizedBox(
-          width: AppComponents.getBodyWidth,
-          child: Column(
-            children: [
-              PADDING_LARGE_HEIGHT,
-              SizedBox(
-                height: 72,
-                child: Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppComponents.sansTitle(
-                            "Upload your What-If Report here:"),
-                        _uploadPDFButton(),
-                      ]),
-                ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/bg.jpg'), fit: BoxFit.cover),
+            ),
+          ),
+          Container(color: Colors.white.withOpacity(0.2)),
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24.r),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12.r, sigmaY: 12.r),
+                child: SizedBox(width: 0.8.sw, height: 0.8.sh),
               ),
-              PADDING_MEDIUM_HEIGHT,
-              SizedBox(
-                height: 72,
-                child: Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppComponents.sansTitle("Major:"),
-                        DropdownMenu<int>(
-                          width: 256,
-                          inputDecorationTheme: const InputDecorationTheme(
-                              border: UnderlineInputBorder()),
-                          dropdownMenuEntries: const [
-                            DropdownMenuEntry<int>(value: 1, label: "CS"),
-                            DropdownMenuEntry<int>(value: 2, label: "DS"),
-                            DropdownMenuEntry<int>(value: 3, label: "Cyber"),
-                            DropdownMenuEntry<int>(value: 4, label: "Loser"),
-                          ],
-                          onSelected: (index) => print(index),
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(16.r),
+              width: 0.8.sw,
+              height: 0.8.sh,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24.r),
+                color: Colors.white.withOpacity(0.75),
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: AppComponents.getBodyWidth,
+                  child: Column(
+                    children: [
+                      PADDING_LARGE_HEIGHT,
+                      SizedBox(
+                        height: 72.r,
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  AppComponents.sansTitle("What-If Report:"),
+                                  _uploadPDFButton(),
+                                ],
+                              ),
+                              Obx(() => AppComponents.sansBody(
+                                  controller.filename.value + '   ')),
+                            ],
+                          ),
                         ),
-                      ]),
-                ),
-              ),
-              PADDING_MEDIUM_HEIGHT,
-              SizedBox(
-                height: 72,
-                child: Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppComponents.sansTitle("Minor (optional):"),
-                        DropdownMenu<int>(
-                          width: 256,
-                          inputDecorationTheme: const InputDecorationTheme(
-                              border: UnderlineInputBorder()),
-                          dropdownMenuEntries: const [
-                            DropdownMenuEntry<int>(value: 1, label: "CS"),
-                            DropdownMenuEntry<int>(value: 2, label: "DS"),
-                            DropdownMenuEntry<int>(value: 3, label: "Cyber"),
-                            DropdownMenuEntry<int>(value: 4, label: "Loser"),
-                          ],
-                          onSelected: (index) => print(index),
+                      ),
+                      PADDING_MEDIUM_HEIGHT,
+                      SizedBox(
+                        height: 72.r,
+                        child: Center(
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppComponents.sansTitle("Major:"),
+                                DropdownMenu<String>(
+                                  width: 0.4.sw,
+                                  inputDecorationTheme:
+                                      const InputDecorationTheme(
+                                          border: UnderlineInputBorder()),
+                                  dropdownMenuEntries: MAJORS
+                                      .map((major) => DropdownMenuEntry<String>(
+                                          value: major, label: major))
+                                      .toList(),
+                                  onSelected: (selected) =>
+                                      controller.major = selected,
+                                ),
+                              ]),
                         ),
-                      ]),
-                ),
-              ),
-              PADDING_MEDIUM_HEIGHT,
-              SizedBox(
-                height: 72,
-                child: Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppComponents.sansTitle("Campus:"),
-                        DropdownMenu<int>(
-                          width: 256,
-                          inputDecorationTheme: const InputDecorationTheme(
-                              border: UnderlineInputBorder()),
-                          dropdownMenuEntries: const [
-                            DropdownMenuEntry<int>(value: 1, label: "CS"),
-                            DropdownMenuEntry<int>(value: 2, label: "DS"),
-                            DropdownMenuEntry<int>(value: 3, label: "Cyber"),
-                            DropdownMenuEntry<int>(value: 4, label: "Loser"),
-                          ],
-                          onSelected: (index) => print(index),
+                      ),
+                      PADDING_MEDIUM_HEIGHT,
+                      SizedBox(
+                        height: 72.r,
+                        child: Center(
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppComponents.sansTitle("Campus:"),
+                                DropdownMenu<String>(
+                                  width: 0.4.sw,
+                                  inputDecorationTheme:
+                                      const InputDecorationTheme(
+                                          border: UnderlineInputBorder()),
+                                  dropdownMenuEntries: CAMPUSES
+                                      .map((major) => DropdownMenuEntry<String>(
+                                          value: major, label: major))
+                                      .toList(),
+                                  onSelected: (selected) =>
+                                      controller.campus = selected,
+                                ),
+                              ]),
                         ),
-                      ]),
-                ),
-              ),
-              PADDING_MEDIUM_HEIGHT,
-              SizedBox(
-                height: 72,
-                child: Center(
-                  child: TextField(
-                    // controller: Get.find<TextEditingController>(),
-                    decoration: InputDecoration(
-                      hintText: 'What ',
-                      prefixIcon: AppComponents.overlayGradient(
-                          const Icon(Icons.hotel_class_outlined)),
-                    ),
-                    onSubmitted: (query) {
-                      AppComponents.showSnackBar("Submitted text $query");
-                    },
+                      ),
+                      PADDING_MEDIUM_HEIGHT,
+                      SizedBox(
+                        height: 72.r,
+                        child: Center(
+                          child: TextField(
+                            controller: Get.find<TextEditingController>(),
+                            decoration: InputDecoration(
+                              hintText: 'Any optional comments?',
+                              prefixIcon: AppComponents.overlayGradient(
+                                  const Icon(Icons.hotel_class_outlined)),
+                            ),
+                            onSubmitted: (query) =>
+                                controller.onSubmitted(context, query),
+                          ),
+                        ),
+                      ),
+                      PADDING_MEDIUM_HEIGHT,
+                      _submitButton(context),
+                    ],
                   ),
                 ),
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

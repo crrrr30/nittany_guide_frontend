@@ -1,18 +1,13 @@
-import 'dart:core';
-
-import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:dio/dio.dart';
+import 'package:nittany_guide_frontend/common/components.dart';
 import 'package:nittany_guide_frontend/common/constants.dart';
+import 'package:nittany_guide_frontend/common/entities.dart';
 
 class HttpService {
   static final dio = Dio(BaseOptions(validateStatus: (status) => true));
 
-  static Future<void> uploadFile(
+  static Future<String?> uploadFile(
       List<int> bytes, void Function(int, int) onSendProgress) async {
-    dio.options.headers['Access-Control-Allow-Origin'] = '*';
-    dio.options.headers['Access-Control-Allow-Methods'] = '*';
-    dio.options.headers['Access-Control-Request-Headers'] =
-        'origin, x-requested-with';
     try {
       final formData =
           FormData.fromMap({"what-if": MultipartFile.fromBytes(bytes)});
@@ -20,14 +15,35 @@ class HttpService {
           data: formData,
           onSendProgress: (count, total) => print("$count / $total}"));
       if (response.statusCode == 200) {
-        print(response.data);
-        return;
+        AppComponents.showSnackBar("Upload succeeded.");
+        return response.data['id'];
       } else {
-        return;
+        AppComponents.showSnackBar("Upload failed!");
       }
     } on DioException catch (e) {
       print(e);
-      return;
     }
+    return null;
+  }
+
+  static Future<Recommendation?> recommend(
+      String id, String major, String campus, String query) async {
+    try {
+      final response =
+          await dio.post(API_BASE_URL + RECOMMEND_API_ENDPOINT, data: {
+        "id": id,
+        "major": major,
+        "campus": campus,
+        "query": query,
+      });
+      if (response.statusCode == 200) {
+        return Recommendation.fromJSON(response.data);
+      } else {
+        AppComponents.showSnackBar("Recommendation could not be generated!");
+      }
+    } on DioException catch (e) {
+      print(e);
+    }
+    return null;
   }
 }
